@@ -1,19 +1,17 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const sqlite3 = require('sqlite3').verbose();
+const db = new sqlite3.Database('./database.sqlite');
 
 const app = express();
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 
-var database = [
-  { name: "Hudson", age: 30 },
-  { name: "Lucas", age: 23 },
-  { name: "Henédio", age: 40 },
-];
-
 app.get("/", (req, res) => {
-  res.render("index", { database });
+  db.all('SELECT * FROM users', (err, database) => {
+    res.render("index", {database});
+  });
 });
 
 app.get("/add", (req, res) => {
@@ -23,30 +21,31 @@ app.get("/add", (req, res) => {
 app.post("/add", (req, res) => {
   const { name, age } = req.body;
 
-  database.push({ name, age });
+  const stmt = db.prepare('INSERT INTO users(name, age) VALUES(?, ?)')
+  stmt.run(name, age)
+  stmt.finalize();
 
   res.redirect("/");
 });
 
 app.get("/:userId/edit", (req, res) => {
-  const { name, age } = database[req.params.userId];
-
-  res.render("edit", { name, age });
+  db.get('SELECT * FROM users WHERE ID = ' + req.params.userId, (err, record) => {
+    res.render("edit", { id, name, age } = record);
+  })
 });
 
 app.post("/:userId/edit", (req, res) => {
   const { name, age } = req.body;
 
-  database[req.params.userId] = {
-    name,
-    age,
-  };
+  const stmt = db.prepare('UPDATE users SET name = ?, age = ? WHERE id = ?')
+  stmt.run(name, age, req.params.userId)
+  stmt.finalize();
 
   res.redirect("/");
 });
 
 app.get("/:userId/delete", (req, res) => {
-  database.splice(req.params.userId, 1);
+  db.run('DELETE FROM users WHERE id = ' + req.params.userId)
 
   res.redirect("/");
 });

@@ -15,14 +15,14 @@
             <th>Age</th>
             <th></th>
         </tr>
-        <% database.forEach((user, index) => { %>
+        <% database.forEach((user) => { %>
             <tr>
-                <td><%= index %></td>
+                <td><%= user.id %></td>
                 <td><%= user.name %></td>
                 <td><%= user.age %></td>
                 <td>
-                    <a href="/<%= index %>/edit">Editar</a>
-                    <a href="/<%= index %>/delete">Deletar</a>
+                    <a href="/<%= user.id %>/edit">Editar</a>
+                    <a href="/<%= user.id %>/delete">Deletar</a>
                 </td>
             </tr>
         <% }); %> 
