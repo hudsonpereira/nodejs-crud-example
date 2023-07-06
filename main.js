@@ -21,7 +21,7 @@ app.get("/add", (req, res) => {
 app.post("/add", (req, res) => {
   const { name, age } = req.body;
 
-  const stmt = db.prepare("INSERT INTO users(name, age, teste) VALUES(?, ?)");
+  const stmt = db.prepare("INSERT INTO users(name, age) VALUES(?, ?)");
   stmt.run(name, age);
   stmt.finalize();
 
